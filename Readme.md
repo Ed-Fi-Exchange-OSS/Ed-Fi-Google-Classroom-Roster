@@ -1,6 +1,6 @@
-﻿# Insert Repository Name Here
+﻿# Ed-Fi Google Classroom Roster
 
-Insert project information here
+A web application for administrators which uses roster data from the Ed-Fi API database to populate classes in Google Classroom.
 
 ## Legal Information
 
