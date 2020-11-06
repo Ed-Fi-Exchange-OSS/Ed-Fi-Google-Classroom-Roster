@@ -1,0 +1,149 @@
+﻿@model WISEroster.Mvc.Models.DeleteCourseMessage
+
+<br />
+<div class="row">
+    <div class="col">
+        <div class="card bg-light">
+            <div class="card-header bg-secondary text-white">
+                <b>Existing Google Classes</b>
+            </div>
+            <div class="card-body">
+                <div id="testConnection" class="h5">@Model.Message</div>
+                <div id="ruleListGridDiv">
+                    <table id="rulesList" class="table table-condensed table-bordered" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Section</th>
+                                <th>Created</th>
+                                <th>Owner</th>
+                                <th>State</th>
+                                <th>Id</th>
+                                <th>
+                                    <div id="buttonDiv">
+                                        <button type="button" id="deleteAll" class="btn-primary">Delete All Courses</button></div>
+
+                                        <div id="spinnerDiv"><span>Deleting... this might take a while.</span><div class="loader" id="syncSpinner"></div></div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts
+{
+    <script type="text/javascript">
+        $("#spinnerDiv").hide();
+        var rulesListTable;
+        var myTimer;
+
+
+        $(document).ready(function() {
+            rulesList();
+
+        });
+
+        function rulesList() {
+            rulesListTable = $('#rulesList').DataTable({
+                ajax: {
+                    url: "@Url.Action("GcList", "Sync")",
+                    type: "POST",
+                    datatype: "json",
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "Name" },
+                    { data: "Section" },
+                    {
+                        data: "CreationTime",
+                        render: function(data) {
+                            return moment(data).format("YYYY-MM-DD HH:mm:ss.SSS");
+                        }
+                    },
+                    { data: "OwnerId" },
+                    { data: "CourseState" },
+                    { data: "Id" },
+                    {
+                        orderable: false,
+                        data: "Id",
+                        render: function (data) {
+                            return '<span id="sp' +
+                                data +
+                                '"><button class="ruleDelete btn-primary" data-id="' +
+                                data +
+                                '">Delete</button></span>';
+                        }
+                    }
+                ],
+                searching: false,
+                paging: false,
+                info: false
+            });
+
+        $('#rulesList tbody').on('click',
+            '.ruleDelete',
+            function() {
+                var ruleId = $(this).data("id");
+                $.ajax({
+                    url: "@Url.Action("DeleteCourse", "Sync")",
+                    type: 'POST',
+                    datatype: 'JSON',
+                    data: { id: ruleId },
+                    success:
+                        function (data) {
+                            $("#sp"+ruleId).html(data);
+                        }
+                });
+            });
+        }
+
+        $("#deleteAll").on("click",
+            function () {
+                syncStart();
+               var ids = [];
+                for (var i = 0; i < rulesListTable.data().length ;i++){
+                   ids[i] = rulesListTable.data()[i].Id;
+                }
+                $.ajax({
+                    url: "@Url.Action("DeleteAll", "Sync")",
+                    type: 'POST',
+                    datatype: 'JSON',
+                    data: { ids: ids },
+                    complete: function(data) { syncDone(data.Message); }
+                });
+            });
+
+        function syncStart() {
+            $("#spinnerDiv").show();
+            $("#buttonDiv").hide();
+            myTimer = setTimeout(keepAlive, 20000);
+        }
+
+        function keepAlive() {
+            //keep process awake
+            $.ajax({
+                url: "@Url.Action("KeepAlive")",
+                type: 'POST'
+            });
+        }
+
+        function syncDone(message) {
+            $("#spinnerDiv").hide();
+            $("#buttonDiv").show();
+            $("#testConnection").html(message);
+            clearTimeout(myTimer);
+            rulesListReload();
+        }
+
+        function rulesListReload() {
+            rulesListTable.ajax.reload();
+        }
+    </script>
+}

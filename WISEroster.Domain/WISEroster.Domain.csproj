@@ -1,0 +1,320 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\EntityFramework.6.4.0\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8260E6C9-FECD-4041-84F4-2C181C798B56}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WISEroster.Domain</RootNamespace>
+    <AssemblyName>WISEroster.Domain</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Api\CourseOffering.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\CourseOfferingConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\Descriptor.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\DescriptorConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\EducationOrganization.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\EducationOrganizationConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\ElectronicMailTypeDescriptor.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\ElectronicMailTypeDescriptorConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\EntryGradeLevelReasonDescriptor.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\EntryGradeLevelReasonDescriptorConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\GradeLevelDescriptor.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\GradeLevelDescriptorConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\IEdfiApiV3DbContext.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\LocalEducationAgency.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\LocalEducationAgencyConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\Location.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\LocationConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\Partials\V3ApiDbContext.cs" />
+    <Compile Include="Api\School.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\SchoolCategory.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\SchoolCategoryConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\SchoolCategoryDescriptor.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\SchoolCategoryDescriptorConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\SchoolConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\SchoolGradeLevel.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\SchoolGradeLevelConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\Section.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\SectionConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\Session.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\SessionConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\Staff.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StaffConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StaffElectronicMail.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StaffElectronicMailConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StaffSectionAssociation.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StaffSectionAssociationConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\Student.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StudentConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StudentEducationOrganizationAssociation.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StudentEducationOrganizationAssociationConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StudentEducationOrganizationAssociationElectronicMail.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StudentEducationOrganizationAssociationElectronicMailConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StudentSchoolAssociation.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StudentSchoolAssociationConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StudentSchoolAssociationEnrollmentType.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StudentSchoolAssociationEnrollmentTypeConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StudentSectionAssociation.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\StudentSectionAssociationConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\TermDescriptor.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\TermDescriptorConfiguration.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\V3Api.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\V3ApiDbContext.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api\V3ApiDbContextFactory.cs">
+      <DependentUpon>V3Api.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GcCourse.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GcCourseConfiguration.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GcCourseUser.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GcCourseUserConfiguration.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\IWISErosterDbContext.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\OrgGcPreferenceConfiguration.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Partials\WISErosterDbContext.cs" />
+    <Compile Include="Models\ProvisioningRule.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ProvisioningRuleConfiguration.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ProvisioningRuleType.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ProvisioningRuleTypeConfiguration.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\RosterGradeLevel.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\RosterGradeLevelConfiguration.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\RosterLocalCourse.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\RosterLocalCourseConfiguration.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\RosterSchool.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\RosterSchoolConfiguration.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SecureItem.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SecureItemConfiguration.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SecureItems_ReadReturnModel.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\OrgGcPreference.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\WISEroster.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\WISErosterDbContext.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\WISErosterDbContextFactory.cs">
+      <DependentUpon>WISEroster.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="EF.Reverse.POCO.Core.ttinclude" />
+    <None Include="EF.Reverse.POCO.ttinclude" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Api\V3Api.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>V3Api.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\WISEroster.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>WISEroster.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.0\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.0\build\EntityFramework.targets'))" />
+  </Target>
+  <Import Project="..\packages\EntityFramework.6.4.0\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.targets')" />
+</Project>

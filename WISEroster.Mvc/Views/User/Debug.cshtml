@@ -1,0 +1,99 @@
+﻿@model WISEroster.Mvc.Models.UserDebugViewModel
+
+@{
+    ViewBag.Title = "Debug";
+}
+
+<h2>Debug</h2>
+
+<div class="row">
+    <dl>
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.EducationOrganizationId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EducationOrganizationId)
+        </dd>
+
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SchoolYear)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SchoolYear)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Agencies)
+        </dt>
+
+        <dd>
+            @if (Model.Agencies != null)
+            {
+                foreach (var a in Model.Agencies)
+                {
+                    @Html.DisplayFor(model => a)
+                    <br/>
+                }
+            }
+            </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CanImpersonate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CanImpersonate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SelectableAgencies)
+        </dt>
+
+        <dd>
+            @if (Model.Agencies != null)
+            {
+                foreach (var a in Model.SelectableAgencies)
+                {
+                    @Html.DisplayFor(model => a.NameOfInstitution)
+                    <br />
+                }
+        }
+        </dd>
+        
+        <dt>
+            @Html.DisplayNameFor(model => model.ApiConnect)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ApiConnect)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DbConnect)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DbConnect)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Exception)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Exception)
+        </dd>
+
+    </dl>
+</div>

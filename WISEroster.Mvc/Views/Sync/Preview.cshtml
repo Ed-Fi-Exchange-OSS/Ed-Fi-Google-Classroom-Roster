@@ -1,0 +1,291 @@
+﻿@model WISEroster.Mvc.Models.SyncViewModel
+
+<br />
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <b>Sync For</b>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("Generate", "Sync", FormMethod.Post, new { id = "ruleForm" }))
+                {
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div>@Html.LabelFor(m => m.SchoolYear)<span class="fa fa-asterisk text-danger"></span></div>
+                            <div>@Html.DropDownListFor(m => m.SchoolYear, Model.Years, new { id = "SchoolYear", style = "width:300px" })</div>
+                            <div class="text-danger">@Html.ValidationMessageFor(model => model.SchoolYear)</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div>@Html.LabelFor(m => m.SelectedSchool)<span class="fa fa-asterisk text-danger"></span></div>
+                            <div>@Html.DropDownListFor(m => m.SelectedSchool, Model.Schools, new { id = "SchoolId", style = "width:300px", onchange = "rulesListReload();" })</div>
+                            <div class="text-danger">@Html.ValidationMessageFor(model => model.SelectedSchool)</div>
+                        </div>
+                        <div class="col-md-2"><button type="submit" id="saveButton" class="btn-primary">Generate Sync List</button></div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col">
+        <div class="card bg-light">
+            <div class="card-header bg-secondary text-white">
+                <b>Classroom Sync List</b>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4"> <span id="testConnection" class="h5"></span><br /> <span id="existingClasses"></span></div>
+                    <div class="col-md-4" id="buttonDiv"><button type="button" id="syncButton" class="btn-primary">Sync Only New Courses</button> 
+                        <button type="button" id="syncButtonAll" class="btn-primary">Sync All Courses</button> 
+                        <button type="button" id="activateButton" class="btn-primary">Activate Saved Courses</button></div>
+                    <div class="col-md-4" id="spinnerDiv"><span>Sending data... this might take a while.</span><div class="loader" id="syncSpinner"></div></div>
+
+                </div>
+                <div id="ruleListGridDiv">
+                    <table id="rulesList" class="table table-condensed table-bordered" width="100%">
+                        <thead>
+                        <tr>
+                            <th width="20%"><ol><li>Session Name</li>
+                                <li>Grade or Local Course Code</li>
+                                <li>Local Course Title</li>
+                                <li>Section Identifier</li></ol></th>
+                            <th width="20%">GcName / Include For Sync</th>
+                            <th>Staff</th>
+                            <th>Students</th>
+                            <th>Sync History</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts
+{
+    <script type="text/javascript">
+        var rulesListTable;
+        var myTimer;
+
+        function filter() {
+            return { schoolYear: $("#SchoolYear").val(), schoolId: $("#SchoolId").val(), allCourses: false };
+        }
+
+        function filterAll() {
+            return { schoolYear: $("#SchoolYear").val(), schoolId: $("#SchoolId").val(), allCourses: true };
+        }
+
+        $("#spinnerDiv").hide();
+        $('#buttonDiv').hide();
+        $(document).ready(function() {
+            @if (Model.Schools.Any())
+            {
+                @:rulesList();
+            }
+            $.get("@Url.Action("TestConnection")",
+                function(data) {
+                    if (!data.Connected) {
+                        $('#buttonDiv').hide();
+                    } else {
+                        $('#buttonDiv').show();
+                        $("#existingClasses").html('@Html.ActionLink("Classroom List", "Existing")');
+                    }
+                    $("#testConnection").html(data.Message);
+                });
+
+        });
+
+        function rulesList() {
+            rulesListTable = $('#rulesList').DataTable({
+                ajax: {
+                    url: "@Url.Action("ClassList", "Sync")",
+                    type: "POST",
+                    datatype: "json",
+                    data: function(d) {
+                        return filter();
+                    },
+                    dataSrc: ""
+                },
+                columns: [
+                    {
+                        data: null,
+                        render: function(data) {
+                            return "<ol><li>" +
+                                data.SessionName +
+                                "</li><li>" +
+                                data.LocalCourseCode +
+                                "</li><li>" +
+                                data.LocalCourseTitle +
+                                "</li><li>" +
+                                data.LocalCourseCode +
+                                "</li></ol>";
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data) {
+                            return data.GcName + " / " + moment(data.CreateDate).format("YYYY-MM-DD HH:mm:ss.SSS");
+                        }
+                    },
+                    {
+                        orderable: false,
+                        data: "Staff",
+                        defaultContent: ''
+                    },
+                    {
+                        orderable: false,
+                        data: "Student",
+                        defaultContent: ''
+                    },
+                    {
+                        data: "GcMessage"
+                    },
+                    {
+                        orderable: false,
+                        data: null,
+                        render: function(data) {
+                            return ('<span id="sp' +
+                                    data.GcName +
+                                    '"><button class="classSync btn-primary" data-id="' +
+                                    data.GcName +
+                                    '">Sync</button></span>') +
+                                (data.Saved && !data.Activated
+                                    ? ' <span id="a' +
+                                    data.GcName +
+                                    '"><button class="classActivate btn-primary" data-id="' +
+                                    data.GcName +
+                                    '">Activate</button></span>'
+                                    : ''
+                                );
+                        }
+                    }
+                ],
+                searching: false,
+                paging: false,
+                info: false
+            });
+
+
+            $('#rulesList tbody').on('click',
+                '.classSync',
+                function() {
+                    var ruleId = $(this).data("id");
+                    $.ajax({
+                        url: "@Url.Action("SendSelectedCourse", "Sync")",
+                        type: 'POST',
+                        datatype: 'JSON',
+                        data: {
+                            schoolYear: $("#SchoolYear").val(),
+                            schoolId: $("#SchoolId").val(),
+                            classToSync: ruleId
+                        },
+                        success:
+                            function(data) {
+                                $(document.getElementById("sp" + ruleId)).html(data);
+                            }
+                    });
+                });
+
+            $('#rulesList tbody').on('click',
+                '.classActivate',
+                function() {
+                    var id = $(this).data("id");
+                    $.ajax({
+                        url: "@Url.Action("ActivateCourse", "Sync")",
+                        type: 'POST',
+                        datatype: 'JSON',
+                        data: { schoolYear: $("#SchoolYear").val(), schoolId: $("#SchoolId").val(), id: id },
+                        success:
+                            function(data) {
+                                $(document.getElementById("a" + id)).html(data);
+                            }
+                    });
+                });
+        }
+
+
+        function rulesListReload() {
+            rulesListTable.ajax.reload();
+        }
+
+        $("#SchoolYear").on("change",
+            function() {
+                UpdateOptions('@Url.Action("FilterSchools", "Home")',
+                    $("#ruleForm").serialize(),
+                    "#SchoolId",
+                    "");
+                $("#SchoolId").trigger("change");
+                rulesListTable.ajax.reload();
+            });
+
+        $("#syncButton").on("click",
+            function() {
+                syncStart();
+                $.ajax({
+                    url: "@Url.Action("SendCourses")",
+                    type: 'POST',
+                    datatype: 'JSON',
+                    data: filter(),
+                    complete: function(data) { syncDone(data); }
+                });
+            });
+
+        $("#syncButtonAll").on("click",
+            function() {
+                syncStart();
+                $.ajax({
+                    url: "@Url.Action("SendCourses")",
+                    type: 'POST',
+                    datatype: 'JSON',
+                    data: filterAll(),
+                    complete: function(data) { syncDone(data); }
+                });
+            });
+
+        $("#activateButton").on("click",
+            function() {
+                syncStart();
+                $.ajax({
+                    url: "@Url.Action("SendCourseActivations")",
+                    type: 'POST',
+                    datatype: 'JSON',
+                    data: { schoolYear: $("#SchoolYear").val(), schoolId: $("#SchoolId").val() },
+                    complete: function(data) { syncDone(data); }
+                });
+            });
+
+        function syncStart() {
+            $("#spinnerDiv").show();
+            $("#buttonDiv").hide();
+            myTimer = setTimeout(keepAlive, 20000);
+        }
+
+        function keepAlive() {
+            //keep process awake
+            $.ajax({
+                url: "@Url.Action("KeepAlive")",
+                type: 'POST'
+            });
+        }
+
+
+
+        function syncDone(data) {
+            $("#spinnerDiv").hide();
+            $("#buttonDiv").show();
+            if (data.Message) {
+                $("#testConnection").html(data.Message);
+            }
+            clearTimeout(myTimer);
+            rulesListReload();
+        }
+    </script>
+}

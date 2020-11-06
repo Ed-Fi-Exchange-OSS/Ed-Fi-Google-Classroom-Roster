@@ -1,0 +1,421 @@
+﻿@model WISEroster.Mvc.Models.ProvisioningRulesViewModel
+
+<br />
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <b>Provisioning Rules</b>
+            </div>
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-success">
+                    <strong>Successfully saved the draft</strong>
+                </div>
+            }
+            <div class="card-body">
+                @using (Html.BeginForm("Rule", "Home", FormMethod.Post, new { id = "ruleForm", onsubmit = "$('#saveButton').click(); return false;" }))
+                {
+                    @Html.HiddenFor(m => m.EducationOrganizationId, new { id = "EducationOrganizationId" })
+                    @Html.HiddenFor(m => m.TypeId, new { id = "TypeId" })
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div>@Html.LabelFor(m => m.SchoolYear)<span class="fa fa-asterisk text-danger"></span></div>
+                            <div>@Html.DropDownListFor(m => m.SchoolYear, Model.Years, new { id = "SchoolYear", style = "width:300px" })</div>
+                            <div class="text-danger">@Html.ValidationMessageFor(model => model.SchoolYear)</div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div>@Html.LabelFor(m => m.SchoolCategoryDescriptorId)</div>
+                            <div>@Html.DropDownListFor(m => m.SchoolCategoryDescriptorId, Model.Categories, "All School Types", new { id = "SchoolCategoryDescriptorId", style = "width:350px" })</div>
+                            <div class="text-danger">@Html.ValidationMessageFor(model => model.SchoolCategoryDescriptorId)</div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div>@Html.LabelFor(m => m.SelectedSchools)<span class="fa fa-asterisk text-danger"></span></div>
+                            <div>@Html.ListBoxFor(m => m.SelectedSchools, Model.Schools, new { id = "SchoolId", style = "width:300px" })</div>
+                            <div class="text-danger">@Html.ValidationMessageFor(model => model.SelectedSchools)</div>
+                        </div>
+                    </div>
+
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="course-tab" data-toggle="tab" href="#course" role="tab" aria-controls="course" aria-selected="true">By Roster</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="enroll-tab" data-toggle="tab" href="#enroll" role="tab" aria-controls="enroll" aria-selected="false">By Grade</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="teacher-tab" data-toggle="tab" href="#teacher" role="tab" aria-controls="teacher" aria-selected="false">By Teacher</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="course" role="tabpanel" aria-labelledby="course-tab">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div>@Html.LabelFor(m => m.SelectedSession)<span class="fa fa-asterisk text-danger"></span></div>
+                                    <div>@Html.DropDownListFor(m => m.SelectedSession, Model.Sessions, "Select a Session", new { id = "Term", style = "width:300px" })</div>
+                                    <div class="text-danger">@Html.ValidationMessageFor(model => model.SelectedSession)</div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div>@Html.LabelFor(m => m.SelectedCourses)<span class="fa fa-asterisk text-danger"></span></div>
+                                    <div>@Html.ListBoxFor(m => m.SelectedCourses, Model.Courses, new { id = "CourseTitle", style = "width:300px" })</div>
+                                    <div class="text-danger">@Html.ValidationMessageFor(model => model.SelectedCourses)</div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div><label>Include Selected Courses @Html.RadioButtonFor(m => m.IncludeExclude, "true", new { @id = "include" })</label></div>
+                                    <div><label>Exclude Selected Courses @Html.RadioButtonFor(m => m.IncludeExclude, "false", new { @id = "exclude" })</label></div>
+                                    <br />
+                                    <div><label>Group sections by Local Course Code @Html.CheckBoxFor(m => m.GroupByTitle) </label></div>
+                                </div>
+                                <div class="col-sm-12">
+                                    @Html.LabelFor(m => m.StaffOnly)
+                                    @Html.CheckBoxFor(m => m.StaffOnly)
+                                    <p>
+                                        <span class="fa fa-info-circle"></span> If you check the staff only box, only teachers and courses for a selected term are sent to Google Classroom.
+                                        The teacher may manually add students to the class in Google Classroom or the students may use the join code to join the class.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="enroll" role="tabpanel" aria-labelledby="enroll-tab">
+                            <div class="col-sm-4">
+                                <div>@Html.LabelFor(m => m.SelectedGrades)<span class="fa fa-asterisk text-danger"></span></div>
+                                <div>@Html.ListBoxFor(m => m.SelectedGrades, Model.Grades, new { id = "Grades", style = "width:300px" })</div>
+                                <div class="text-danger">@Html.ValidationMessageFor(model => model.SelectedGrades)</div>
+                            </div>
+
+                        </div>
+                        <div class="tab-pane fade" id="teacher" role="tabpanel" aria-labelledby="teacher-tab">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <div>@Html.LabelFor(m => m.SelectedSessionByTeacher)<span class="fa fa-asterisk text-danger"></span></div>
+                                    <div>@Html.DropDownListFor(m => m.SelectedSessionByTeacher, Model.Sessions, "Select a Session", new { id = "TermByTeacher", style = "width:200px" })</div>
+                                    <div class="text-danger">@Html.ValidationMessageFor(model => model.SelectedSessionByTeacher)</div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div>@Html.LabelFor(m => m.SelectedTeacher)<span class="fa fa-asterisk text-danger"></span></div>
+                                    <div>@Html.DropDownListFor(m => m.SelectedTeacher, Model.Teachers, "Select a Teacher", new { id = "Teachers", style = "width:300px" })</div>
+                                    <div class="text-danger">@Html.ValidationMessageFor(model => model.SelectedTeacher)</div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div>@Html.LabelFor(m => m.SelectedCoursesByTeacher)<span class="fa fa-asterisk text-danger"></span></div>
+                                    <div>@Html.ListBoxFor(m => m.SelectedCoursesByTeacher, Model.CoursesByTeacher, new { id = "CourseTitleByTeacher", style = "width:300px" })</div>
+                                    <div class="text-danger">@Html.ValidationMessageFor(model => model.SelectedCoursesByTeacher)</div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div><label>Include Selected Courses @Html.RadioButtonFor(m => m.IncludeExcludeByTeacher, "true", new { @id = "includeByTeacher" })</label></div>
+                                    <div><label>Exclude Selected Courses @Html.RadioButtonFor(m => m.IncludeExcludeByTeacher, "false", new { @id = "excludeByTeacher" })</label></div>
+                                    <br />
+                                    <div><label>Group sections by Local Course Code @Html.CheckBoxFor(m => m.GroupByTitleByTeacher) </label></div>
+                                </div>
+                                <div class="col-sm-12">
+                                    @Html.LabelFor(m => m.StaffOnlyByTeacher)
+                                    @Html.CheckBoxFor(m => m.StaffOnlyByTeacher)
+                                    <p>
+                                        <span class="fa fa-info-circle"></span> If you check the staff only box, only teachers and courses for a selected term are sent to Google Classroom.
+                                        The teacher may manually add students to the class in Google Classroom or the students may use the join code to join the class.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-md-4"><button type="submit" onclick="saveProvisioningRule()" id="saveButton" class="btn-primary">Save As Draft</button></div><div class="col-md-4"><button type="reset" class="btn-primary">New Rule</button></div>
+                    </div>
+
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col">
+        <div class="card bg-light">
+            <div class="card-header bg-secondary text-white">
+                <b>Rules List</b>
+            </div>
+            <div class="card-body">
+                <div id="ruleListGridDiv">
+                    <table id="rulesList" class="table table-condensed table-bordered" width="100%">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Year</th>
+                                <th>Schools</th>
+                                <th>Selection</th>
+                                <th>Session Name</th>
+                                <th>Courses</th>
+                                <th>Grades</th>
+                                <th>Staff Only</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="ruleClasses" style="display: none;">
+    <table id="ruleDetail_{0}" class="table table-condensed table-bordered childTable" width="100%">
+        <thead>
+            <tr>
+                <th>School</th>
+                <th>Grade or Local Course Code</th>
+                <th>Local Course Title</th>
+                <th>Staff Name(s)</th>
+                <th>Student Count</th>
+                <th>GC Class Name</th>
+            </tr>
+        </thead>
+        <tfoot>
+        </tfoot>
+
+    </table>
+</div>
+
+
+@section scripts
+{
+    <script type="text/javascript">
+        var rulesListTable;
+
+        function yearFilter() { return { schoolYear: $("#SchoolYear").val() }; }
+
+        $(document).ready(function() {
+            rulesList();
+            $("#course-tab").on("click",
+                function() {
+                    $("#TypeId").val(1);
+                });
+            $("#enroll-tab").on("click",
+                function() {
+                    $("#TypeId").val(2);
+                });
+            $("#teacher-tab").on("click",
+                function() {
+                    $("#TypeId").val(3);
+                });
+            if (@Model.TypeId == 2) {
+                $("#enroll-tab").trigger("click");
+            }
+            if (@Model.TypeId == 3) {
+                $("#teacher-tab").trigger("click");
+            }
+        });
+
+        function rulesList() {
+            rulesListTable = $('#rulesList').DataTable({
+                ajax: {
+                    url: "@Url.Action("RuleList", "Home")",
+                    type: "POST",
+                    datatype: "json",
+                    data: function(d) {
+                        return yearFilter();
+                    },
+                    dataSrc: ""
+                },
+                columns: [
+                    {
+                        orderable: false,
+                        data: null,
+                        defaultContent: '<a class="fa fa-plus rule-control"></a>'
+                    },
+                    { data: "SchoolYear" },
+                    { data: "SchoolNames" },
+                    { data: "SelectionDetail"},
+                    { data: "SessionName" },
+                    { data: "Courses" },
+                    { data: "GradeNames" },
+                    {
+                        data: "StaffOnly",
+                        render: function(data, type, row) {
+                            return (data == true) ? 'Yes' : 'No';
+                        }
+                    },
+                    {
+                        orderable: false,
+                        data: "RuleId",
+                        render: function(data) {
+                            return '<button class="ruleDelete btn-primary" data-id="' +
+                                data +
+                                '">Remove</button>';
+                        }
+                    }
+                ],
+                searching: false,
+                paging: false,
+                info: false
+            });
+
+            // Add event listener for opening and closing details
+            $('#rulesList tbody').on('click',
+                'a.rule-control',
+                function() {
+                    var tr = $(this).closest('tr');
+                    var row = rulesListTable.row(tr);
+
+                    if (row.child.isShown()) {
+                        // This row is already open - close it
+                        row.child.hide();
+                        tr.removeClass('shown');
+                    } else {
+                        // Open this row
+                        row.child(ruleFormat(row.data())).show();
+
+                        var ruleId = row.data().RuleId;
+                        loadRule(ruleId);
+                        tr.addClass('shown');
+
+                    }
+                    return false;
+                });
+
+            $('#rulesList tbody').on('click',
+                '.ruleDelete',
+                function() {
+                    var ruleId = $(this).data("id");
+                    $.ajax({
+                        url: "@Url.Action("DeleteRule", "Home")",
+                        type: 'POST',
+                        datatype: 'JSON',
+                        data: { id: ruleId },
+                        success:
+                            function() {
+                                rulesListTable.ajax.reload();
+                            }
+                    });
+                });
+        }
+
+        function ruleFormat(d) {
+            return $("#ruleClasses").html().replace("{0}", d.RuleId);
+        }
+
+        function loadRule(ruleId) {
+            var divname = "#ruleDetail_" + ruleId;
+            var rule = { ruleId: ruleId };
+
+            $(divname).DataTable({
+                destroy: true,
+                ajax: {
+                    url: "@Url.Action("ClassList", "Home")",
+                    data: rule,
+                    type: "POST",
+                    datatype: "json",
+                    dataSrc: ""
+                },
+                order: [[4, "desc"]],
+                columns: [
+                    { data: "SchoolName" },
+                    { data: "LocalCourseCode" },
+                    { data: "LocalCourseTitle" },
+                    { data: "StaffNames" },
+                    { data: "StudentCount" },
+                    { data: "ClassName" }
+                ]
+            });
+
+            return false;
+        }
+
+        $("#SchoolYear").on("change",
+            function() {
+                UpdateOptions('@Url.Action("FilterSchools")',
+                    $("#ruleForm").serialize(),
+                    "#SchoolId",
+                    "All Schools");
+                $("#SchoolId").trigger("change");
+                rulesListTable.ajax.reload();
+            });
+
+        $("#SchoolCategoryDescriptorId").on("change",
+            function() {
+                UpdateOptions('@Url.Action("FilterSchools")',
+                    $("#ruleForm").serialize(),
+                    "#SchoolId",
+                    "All Schools");
+                $("#SchoolId").trigger("change");
+            });
+        $("#SchoolId").on("change",
+            function() {
+                UpdateOptions('@Url.Action("FilterTerms")',
+                    $("#ruleForm").serialize(),
+                    "#Term",
+                    "Select a Session");
+                $("#Term").trigger("change");
+                UpdateOptions('@Url.Action("FilterTerms")',
+                    $("#ruleForm").serialize(),
+                    "#TermByTeacher",
+                    "Select a Session");
+                $("#Session").trigger("change");
+                UpdateOptions('@Url.Action("FilterGrades")',
+                    $("#ruleForm").serialize(),
+                    "#Grades",
+                    "All Grades");
+                UpdateOptions('@Url.Action("FilterTeachers")',
+                    $("#ruleForm").serialize(),
+                    "#Teachers",
+                    "Select a Teacher");
+            });
+
+        $("#Term").on("change",
+            function() {
+                UpdateOptions('@Url.Action("FilterTitles")',
+                    $("#ruleForm").serialize(),
+                    "#CourseTitle",
+                    "All Courses");
+            });
+
+        $("#TermByTeacher").on("change",
+            function() {
+                UpdateOptions('@Url.Action("FilterTeachers")',
+                    $("#ruleForm").serialize(),
+                    "#Teachers",
+                    "Select a Teacher");
+                UpdateOptions('@Url.Action("FilterTitlesByTeacher")',
+                    $("#ruleForm").serialize(),
+                    "#CourseTitleByTeacher",
+                    "All Courses");
+            });
+
+        $("#Teachers").on("change",
+            function() {
+                UpdateOptions('@Url.Action("FilterTitlesByTeacher")',
+                    $("#ruleForm").serialize(),
+                    "#CourseTitleByTeacher",
+                    "All Courses");
+            });
+
+
+        $("#CourseTitle").on("change",
+            function() {
+                //alert($(this).val());
+                if ($(this).val() == "") {
+                    $("#exclude").attr("disabled", true);
+                } else {
+                    $("#exclude").attr("disabled", false);
+                }
+
+            });
+
+          $("#CourseTitleByTeacher").on("change",
+            function() {
+                //alert($(this).val());
+                if ($(this).val() == "") {
+                    $("#excludeByTeacher").attr("disabled", true);
+                } else {
+                    $("#excludeByTeacher").attr("disabled", false);
+                }
+
+            });
+
+
+    </script>
+}

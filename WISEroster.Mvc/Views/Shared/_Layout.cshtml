@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WISEroster Portal (sample)</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/nocdn")
+    @Styles.Render("~/Content/nocdncss")
+
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/site")
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            @Html.ActionLink("WISEroster Portal (sample)", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+
+            @Html.ActionLink("Provisioning Rules", "Index", "Home") |
+            @Html.ActionLink("Setup", "GcPreferences", "User") |
+            @Html.ActionLink("Sync", "Preview", "Sync") |
+            @Html.ActionLink($"{ViewBag.User.FirstName} ({@ViewBag.DefaultAgency})", "Index", "User")
+
+        </div>
+
+    </nav>
+    <div class="body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>Sample provided by the Wisconsin Department of Public Instruction</p>
+        </footer>
+    </div>
+    <script type="text/javascript">
+        function FadePageContent() {
+            $("#contianer").fadeTo('slow', 0.2);
+        }
+
+        function ClosePopup() {
+            $("#contianer").fadeTo('slow', 1);
+        }
+
+        function PageReload() {
+            location.reload();
+        }
+    </script>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>
+

@@ -1,0 +1,28 @@
+﻿@model WISEroster.Mvc.Models.ChangeAgencyViewModel
+
+<table class="table table-condensed">
+    <tr><th>Id</th><th>Name</th></tr>
+
+    @foreach (var org in Model.Organizations)
+    {
+        <tr>
+            <td>@Html.ActionLink(@org.EducationOrganizationId.ToString(), "ChangeAgency", "User", new { id = org.EducationOrganizationId },null)</td>
+            <td>@Html.ActionLink(@org.NameOfInstitution, "ChangeAgency", "User", new { id = org.EducationOrganizationId }, null)</td>
+        </tr>
+    }
+</table>
+
+@if (Model.AllOrganizations != null)
+{
+<table class="table table-condensed">
+    <tr><th>Id</th><th>Name</th></tr>
+
+    @foreach (var org in Model.AllOrganizations)
+    {
+        <tr>
+            <td>@Html.ActionLink(@org.EducationOrganizationId.ToString(), "ChangeAgency", "User", new { id = org.EducationOrganizationId },null)</td>
+            <td>@Html.ActionLink(@org.NameOfInstitution, "ChangeAgency", "User", new { id = org.EducationOrganizationId },null)</td>
+        </tr>
+    }
+</table>
+}

@@ -1,0 +1,71 @@
+﻿@model WISEroster.Mvc.Models.GcPreferenceViewModel
+@{
+    ViewBag.Title = "GcPreferences";
+}
+<div class="row">
+    <div class="col">
+
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <b>Google Classroom Setup/Preferences</b>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm())
+                {
+
+                    <h5 class="card-subtitle  mb-2 ">Preferences</h5>
+                    <div class="row">
+                        <div class="col-sm-4">@Html.LabelFor(m => m.AllowExternalDomains, "Allow teachers and students from other domains")</div>
+                        <div class="col-sm-1">@Html.CheckBoxFor(m => m.AllowExternalDomains)</div>
+                        <div class="col-md-7">
+                            Teachers and students in Google Classroom must be from the same domain as the user below by default.
+                            Allowing users from external domains requires extra configuration in Google Classroom.
+                        </div>
+                    </div>
+                    <h5 class="card-subtitle  mb-2 ">Google Classroom Credentials</h5>
+                    <div class="row">
+                        <div class="col">
+                            <ol>
+                                <li>From <a href="https://console.developers.google.com">https://console.developers.google.com</a> -> Create a new project -> 'WISERoster'</li>
+                                <li>
+                                    From Credentials -> Create Credentials -> OAuth client ID
+                                    <ul>
+                                        <li>Application type: Web application</li>
+                                        <li>Name: WISERoster</li>
+                                        <li>Authorized redirects URIs: @Url.Action("IndexAsync","AuthCallback", null, this.Request.Url.Scheme) </li>
+                                    </ul>
+                                </li>
+                                <li>Download client secret json file</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">@Html.LabelFor(m => m.ClientId, "client_id")</div>
+                        <div class="col-sm-8">@Html.TextBoxFor(m => m.ClientId) <i>From client secret json</i></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">@Html.LabelFor(m => m.ClientSecret, "client_secret")</div>
+                        <div class="col-sm-8">@Html.TextBoxFor(m => m.ClientSecret) <i>From client secret json</i></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">@Html.LabelFor(m => m.GcUserEmail, "Admin account")</div>
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.GcUserEmail)
+                            <i>An admin or super admin account is required to sync data with Google Classroom</i>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-8">
+                            <h5><i>  @Html.DisplayFor(m => m.CredentialMessage)</i></h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-8"><button type="submit">Save and Test</button></div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
