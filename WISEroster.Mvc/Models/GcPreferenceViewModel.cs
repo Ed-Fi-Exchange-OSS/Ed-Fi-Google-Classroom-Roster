@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace WISEroster.Mvc.Models
+﻿namespace WISEroster.Mvc.Models
 {
     public class GcPreferenceViewModel
     {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace WISEroster.Mvc.Classroom
+﻿namespace WISEroster.Mvc.Classroom
 {
 
     //https://keestalkstech.com/2016/07/offline-google-authentication-for-mvc-net/

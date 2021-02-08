@@ -27,6 +27,7 @@ namespace WISEroster.Domain.Models
         public string SectionIdentifier { get; set; } // SectionIdentifier (Primary key) (length: 255)
         public string EmailAddress { get; set; } // EmailAddress (Primary key) (length: 128)
         public bool IsTeacher { get; set; } // IsTeacher
+        public string UserId { get; set; } // UserId (length: 200)
 
         // Foreign keys
 

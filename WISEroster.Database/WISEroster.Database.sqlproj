@@ -87,8 +87,12 @@
     <Build Include="dbo\Tables\RosterGradeLevel.sql" />
     <Build Include="dbo\Tables\ProvisioningRuleType.sql" />
     <Build Include="dbo\Tables\GcCourseUser.sql" />
+    <Build Include="dbo\Tables\GcLog.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment1.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PreDeploy Include="Scripts\Script.PreDeployment1.sql" />
   </ItemGroup>
 </Project>

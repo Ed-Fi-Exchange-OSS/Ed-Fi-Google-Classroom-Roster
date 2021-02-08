@@ -22,6 +22,7 @@ namespace WISEroster.Domain.Models
     {
         public System.Data.Entity.DbSet<GcCourse> GcCourses { get; set; } // GcCourse
         public System.Data.Entity.DbSet<GcCourseUser> GcCourseUsers { get; set; } // GcCourseUser
+        public System.Data.Entity.DbSet<GcLog> GcLogs { get; set; } // GcLog
         public System.Data.Entity.DbSet<OrgGcPreference> OrgGcPreferences { get; set; } // OrgGcPreferences
         public System.Data.Entity.DbSet<ProvisioningRule> ProvisioningRules { get; set; } // ProvisioningRules
         public System.Data.Entity.DbSet<ProvisioningRuleType> ProvisioningRuleTypes { get; set; } // ProvisioningRuleType
@@ -92,6 +93,7 @@ namespace WISEroster.Domain.Models
 
             modelBuilder.Configurations.Add(new GcCourseConfiguration());
             modelBuilder.Configurations.Add(new GcCourseUserConfiguration());
+            modelBuilder.Configurations.Add(new GcLogConfiguration());
             modelBuilder.Configurations.Add(new OrgGcPreferenceConfiguration());
             modelBuilder.Configurations.Add(new ProvisioningRuleConfiguration());
             modelBuilder.Configurations.Add(new ProvisioningRuleTypeConfiguration());
@@ -107,6 +109,7 @@ namespace WISEroster.Domain.Models
         {
             modelBuilder.Configurations.Add(new GcCourseConfiguration(schema));
             modelBuilder.Configurations.Add(new GcCourseUserConfiguration(schema));
+            modelBuilder.Configurations.Add(new GcLogConfiguration(schema));
             modelBuilder.Configurations.Add(new OrgGcPreferenceConfiguration(schema));
             modelBuilder.Configurations.Add(new ProvisioningRuleConfiguration(schema));
             modelBuilder.Configurations.Add(new ProvisioningRuleTypeConfiguration(schema));

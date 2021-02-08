@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Web.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace WISEroster.Mvc.Models
 {

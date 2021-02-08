@@ -78,7 +78,9 @@ namespace WISEroster.Mvc.Controllers
             var syncList =
                 _provisioningRuleBusiness.GetSyncList(lea,
                     schoolYear, schoolId)
-                    .Select(l => new { l.SchoolYear, l.LocalCourseTitle, l.LocalCourseCode, l.SessionName, l.SectionIdentifier, l.CreateDate, l.GcName, l.GcMessage, l.Activated, l.Saved, Staff = String.Join(", ", l.GcCourseUsers.Where(u => u.IsTeacher).Select(u => u.EmailAddress)) , Student = String.Join(", ", l.GcCourseUsers.Where(u => u.IsTeacher == false).Select(u => u.EmailAddress)) });
+                    .Select(l => new { l.SchoolYear, l.LocalCourseTitle, l.LocalCourseCode, l.SessionName, l.SectionIdentifier, l.CreateDate, l.GcName, l.GcMessage, l.Saved, l.Activated,  
+                        Staff = String.Join(", ", l.GcCourseUsers.Where(u => u.IsTeacher).Select(u => u.EmailAddress)) , 
+                        Student = String.Join(", ", l.GcCourseUsers.Where(u => u.IsTeacher == false).Select(u => u.EmailAddress)) });
             HttpContext.Session["SchoolYear"] = schoolYear;
             return Json(syncList);
         }
@@ -122,7 +124,7 @@ namespace WISEroster.Mvc.Controllers
 
             foreach (var gcCourse in syncList)
             {
-                gcCourse.GcId = "p:" + gcCourse.GcName;
+                gcCourse.AliasId = gcCourse.GcName.NameToId();
                 gcCourse.Owner = "me";
             }
 
@@ -130,6 +132,7 @@ namespace WISEroster.Mvc.Controllers
             var task = await Task.Run(async () => await GcSync.SendCourses(this, _setupBusiness, syncMessage, cancellationToken).ConfigureAwait(true));
 
             _provisioningRuleBusiness.SaveSyncProgress(lea, schoolYear, schoolId, task.Courses);
+            _provisioningRuleBusiness.SaveLog(task.Logs);
 
             return Json(task);
         }
@@ -147,13 +150,14 @@ namespace WISEroster.Mvc.Controllers
             var gcCourse = _provisioningRuleBusiness.GetClassToSync(lea, schoolYear, schoolId, classToSync);
             var school = _orgBusiness.GetEducationOrganization(schoolYear, schoolId);
 
-            gcCourse.GcId = "p:" + gcCourse.GcName;
+            gcCourse.AliasId = gcCourse.GcName.NameToId();
             gcCourse.Owner = "me";
 
             var syncMessage = new SyncCourseMessage { Courses = new List<GcCourse> { gcCourse }, LeaId = lea, UserEmail = gcEmail, School = school };
             var task = await Task.Run(async () => await GcSync.SendCourses(this, _setupBusiness, syncMessage, cancellationToken).ConfigureAwait(true));
 
             _provisioningRuleBusiness.SaveSyncProgress(lea, schoolYear, schoolId, task.Courses);
+            _provisioningRuleBusiness.SaveLog(task.Logs);
 
             return task.Courses.First().GcMessage;
         }
@@ -188,9 +192,12 @@ namespace WISEroster.Mvc.Controllers
                 return "Google Classroom setup not completed";
             }
 
-            var task = await Task.Run(async () => await GcSync.DeleteCourse(this, _setupBusiness, id, lea, gcEmail, cancellationToken).ConfigureAwait(true));
+            var syncMessage = new SyncCourseMessage { Courses = new List<GcCourse> { new GcCourse { CourseId = id } }, LeaId = lea, UserEmail = gcEmail };
 
-            return task;
+            var task = await Task.Run(async () => await GcSync.DeleteCourses(this, _setupBusiness, syncMessage, cancellationToken).ConfigureAwait(true));
+            _provisioningRuleBusiness.SaveLog(task.Logs);
+
+            return task.Message;
         }
 
         [HttpPost]
@@ -202,8 +209,10 @@ namespace WISEroster.Mvc.Controllers
             {
                 return Json("Google Classroom setup not completed");
             }
+            var syncMessage = new SyncCourseMessage { Courses = ids.Select(i=> new GcCourse { CourseId = i }).ToList(), LeaId = lea, UserEmail = gcEmail };
 
-            var task = await Task.Run(async () => await GcSync.DeleteCourses(this, _setupBusiness, ids, lea, gcEmail, cancellationToken).ConfigureAwait(true));
+            var task = await Task.Run(async () => await GcSync.DeleteCourses(this, _setupBusiness, syncMessage, cancellationToken).ConfigureAwait(true));
+            _provisioningRuleBusiness.SaveLog(task.Logs);
 
             return Json(task);
         }
@@ -217,17 +226,19 @@ namespace WISEroster.Mvc.Controllers
             {
                 return "Google Classroom setup not completed";
             }
+            var syncMessage = new SyncCourseMessage { Courses = new List<GcCourse>{new GcCourse{AliasId = id.NameToId()}}, LeaId = lea, UserEmail = gcEmail };
 
-            var task = await Task.Run(async () => await GcSync.ActivateCourse(this, _setupBusiness, "p:" + id, lea, gcEmail, cancellationToken).ConfigureAwait(true));
-            if (task == "Active")
+            var task = await Task.Run(async () => await GcSync.SendCourseActivations(this, _setupBusiness, syncMessage, cancellationToken).ConfigureAwait(true));
+            if (task.Message == "Active")
             {
                 var gc = _provisioningRuleBusiness.GetClassToSync(lea, schoolYear, schoolId, id);
                 gc.Activated = true;
                 gc.GcMessage = $"Activated {DateTime.Now}, {gc.GcMessage}";
                 _provisioningRuleBusiness.SaveSyncProgress(lea, schoolYear, schoolId, new List<GcCourse>{gc});
             }
+            _provisioningRuleBusiness.SaveLog(task.Logs);
 
-            return task;
+            return task.Message;
         }
 
         [HttpPost]
@@ -245,7 +256,7 @@ namespace WISEroster.Mvc.Controllers
 
             foreach (var gcCourse in syncList)
             {
-                gcCourse.GcId = "p:" + gcCourse.GcName;
+                gcCourse.AliasId = gcCourse.GcName.NameToId();
                 gcCourse.Owner = "me";
             }
 
@@ -253,9 +264,57 @@ namespace WISEroster.Mvc.Controllers
             var task = await Task.Run(async () => await GcSync.SendCourseActivations(this, _setupBusiness, syncMessage, cancellationToken).ConfigureAwait(true));
 
             _provisioningRuleBusiness.SaveSyncProgress(lea, schoolYear, schoolId, task.Courses);
+            _provisioningRuleBusiness.SaveLog(task.Logs);
 
             return Json(task);
         }
+
+        [HttpPost]
+        public async Task<string> SendInvite(short schoolYear, int schoolId, string classToSync, CancellationToken cancellationToken)
+        {
+            var lea = _sessionInfo.CurrentAgencyId.GetValueOrDefault();
+            var gcEmail = _setupBusiness.GetClientEmail(lea);
+            if (string.IsNullOrWhiteSpace(gcEmail))
+            {
+                return "Google Classroom setup not completed";
+            }
+
+            var gcCourse = _provisioningRuleBusiness.GetClassToSync(lea, schoolYear, schoolId, classToSync);
+            var school = _orgBusiness.GetEducationOrganization(schoolYear, schoolId);
+
+            var syncMessage = new SyncCourseMessage { Courses = new List<GcCourse> { gcCourse }, LeaId = lea, UserEmail = gcEmail, School = school };
+            var task = await Task.Run(async () => await GcSync.InviteToOwn(this, _setupBusiness, syncMessage, cancellationToken).ConfigureAwait(true));
+
+            _provisioningRuleBusiness.SaveSyncProgress(lea, schoolYear, schoolId, task.Courses);
+            _provisioningRuleBusiness.SaveLog(task.Logs);
+
+            return task.Courses.First().GcMessage;
+        }
+
+
+        [HttpPost]
+        public async Task<JsonResult> SendOwnerInvitations(short schoolYear, int schoolId, CancellationToken cancellationToken)
+        {
+            var lea = _sessionInfo.CurrentAgencyId.GetValueOrDefault();
+            var gcEmail = _setupBusiness.GetClientEmail(lea);
+            if (string.IsNullOrWhiteSpace(gcEmail))
+            {
+                return Json(new SyncCourseMessage { Message = "Google Classroom setup not completed" });
+            }
+
+            var syncList = _provisioningRuleBusiness.GetClassesToTransfer(lea, schoolYear, schoolId);
+            var school = _orgBusiness.GetEducationOrganization(schoolYear, schoolId);
+            
+            var syncMessage = new SyncCourseMessage { Courses = syncList, LeaId = lea, UserEmail = gcEmail, School = school };
+            var task = await Task.Run(async () => await GcSync.InviteToOwn(this, _setupBusiness, syncMessage, cancellationToken).ConfigureAwait(true));
+
+            _provisioningRuleBusiness.SaveSyncProgress(lea, schoolYear, schoolId, task.Courses);
+            _provisioningRuleBusiness.SaveLog(task.Logs);
+
+            return Json(task);
+        }
+
+
 
         [HttpPost]
         public JsonResult KeepAlive()

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
-using System.Diagnostics;
 using System.Linq;
 using WISEroster.Business.Models;
 using WISEroster.Domain.Api;
@@ -17,14 +17,19 @@ namespace WISEroster.Business
     {
         void InsertRule(ProvisioningRulesInsertModel model);
         void DeleteRule(int id);
+        void StaffOnly(int id);
+        void IncludeStudents(int id);
         List<RulesListModel> GetRuleList(int leaId, short schoolYear);
         List<ClassToRosterModel> GetClassesForRule(int ruleId);
 
         List<GcCourse> GetSyncList(int leaId, short schoolYear, int schoolId);
         List<GcCourse> GetActivateList(int leaId, short schoolYear, int schoolId);
+        List<GcCourse> GetClassesToTransfer(int leaId, short schoolYear, int schoolId);
+
         GcCourse GetClassToSync(int leaId, short schoolYear, int schoolId, string gcName);
         int GenerateSyncList(int leaId, short schoolYear, int schoolId);
         int SaveSyncProgress(int leaId, short schoolYear, int schoolId, List<GcCourse> courses);
+        int SaveLog(List<GcLog> errors);
     }
     public class ProvisioningRulesBusiness : IProvisioningRulesBusiness
     {
@@ -72,7 +77,7 @@ namespace WISEroster.Business
                         .Select(j => new RosterLocalCourse { LocalCourseCode = j }).Distinct().ToList();
 
                 }
-                else if ( model.TypeId == 2)
+                else if (model.TypeId == 2)
                 {
                     rule.RosterGradeLevels = model.SelectedGrades.Where(g => g > 0)
                         .Select(g => new RosterGradeLevel { GradeLevelDescriptorId = g }).ToList();
@@ -99,6 +104,26 @@ namespace WISEroster.Business
             {
                 var rule = dbContext.ProvisioningRules.First(r => r.RuleId == id);
                 dbContext.ProvisioningRules.Remove(rule);
+                dbContext.SaveChanges();
+            }
+        }
+
+        public void StaffOnly(int id)
+        {
+            using (var dbContext = new WISErosterDbContext())
+            {
+                var rule = dbContext.ProvisioningRules.First(r => r.RuleId == id);
+                rule.StaffOnly = true;
+                dbContext.SaveChanges();
+            }
+        }
+
+        public void IncludeStudents(int id)
+        {
+            using (var dbContext = new WISErosterDbContext())
+            {
+                var rule = dbContext.ProvisioningRules.First(r => r.RuleId == id);
+                rule.StaffOnly = false;
                 dbContext.SaveChanges();
             }
         }
@@ -302,7 +327,7 @@ namespace WISEroster.Business
                 }).ToList();
 
             }
-            else 
+            else
             {
 
                 var codes = rule.RosterLocalCourses.Select(s => s.LocalCourseCode).ToList();
@@ -415,7 +440,7 @@ namespace WISEroster.Business
                 EducationOrganizationId = leaId,
                 LocalCourseTitle = c.CourseOffering.LocalCourseTitle,
                 StaffEmails = c.StaffSectionAssociations.SelectMany(e => e.Staff.StaffElectronicMails.Where(a => pref.AllowExternalDomains || a.ElectronicMailAddress.EndsWith(domain)).Select(a => a.ElectronicMailAddress)).ToList(),
-                StudentEmails = c.StudentSectionAssociations.SelectMany(ssa => ssa.Student.StudentEducationOrganizationAssociations.SelectMany( e => e.StudentEducationOrganizationAssociationElectronicMails.Where(a => pref.AllowExternalDomains || a.ElectronicMailAddress.EndsWith(domain)).Select(a => a.ElectronicMailAddress))).ToList()
+                StudentEmails = c.StudentSectionAssociations.SelectMany(ssa => ssa.Student.StudentEducationOrganizationAssociations.SelectMany(e => e.StudentEducationOrganizationAssociationElectronicMails.Where(a => pref.AllowExternalDomains || a.ElectronicMailAddress.EndsWith(domain)).Select(a => a.ElectronicMailAddress))).ToList()
             }).ToList();
 
 
@@ -428,7 +453,7 @@ namespace WISEroster.Business
                         var i = rule.RosterLocalCourses.Count != 0 ? classPool.Where(c => c.SessionName == rule.SessionName &&
                             rule.RosterLocalCourses.Any(t => t.LocalCourseCode.Trim() == c.LocalCourseCode.Trim()))
                             .GroupBy(c => new { c.LocalCourseTitle, c.LocalCourseCode, c.SessionName }).Select(g => new { g.Key, Emails = g.SelectMany(e => e.StaffEmails), StudentEmails = g.SelectMany(e => e.StudentEmails) })
-                            : classPool.Where( c => c.SessionName == rule.SessionName)
+                            : classPool.Where(c => c.SessionName == rule.SessionName)
                             .GroupBy(c => new { c.LocalCourseTitle, c.LocalCourseCode, c.SessionName }).Select(g => new { g.Key, Emails = g.SelectMany(e => e.StaffEmails), StudentEmails = g.SelectMany(e => e.StudentEmails) });
 
                         foreach (var course in i)
@@ -458,7 +483,7 @@ namespace WISEroster.Business
                                     IsTeacher = true
                                 }));
                             }
-                            else 
+                            else
                             {
                                 schoolCourseUsers.AddRange(course.Emails.Distinct().Select(e => new GcCourseUser
                                 {
@@ -493,7 +518,7 @@ namespace WISEroster.Business
                         var j = classPool.Where(c => c.SessionName == rule.SessionName &&
                             rule.RosterLocalCourses.Any(t => t.LocalCourseCode.Trim() != c.LocalCourseCode.Trim()))
                             .GroupBy(c => new { c.LocalCourseTitle, c.LocalCourseCode, c.SessionName })
-                            .Select(g => new { g.Key, Emails = g.SelectMany(e => e.StaffEmails) , StudentEmails = g.SelectMany(e => e.StudentEmails) });
+                            .Select(g => new { g.Key, Emails = g.SelectMany(e => e.StaffEmails), StudentEmails = g.SelectMany(e => e.StudentEmails) });
 
 
 
@@ -593,7 +618,7 @@ namespace WISEroster.Business
                                     IsTeacher = true
                                 }));
                             }
-                            else 
+                            else
                             {
                                 schoolCourseUsers.AddRange(c.StaffEmails.Distinct().Select(e => new GcCourseUser
                                 {
@@ -654,7 +679,7 @@ namespace WISEroster.Business
                                     IsTeacher = true
                                 }));
                             }
-                            else 
+                            else
                             {
                                 schoolCourseUsers.AddRange(c.StaffEmails.Distinct().Select(e => new GcCourseUser
                                 {
@@ -750,7 +775,7 @@ namespace WISEroster.Business
                 _context.GcCourseUsers.AddRange(toAddUsers);
             }
 
-                return _context.SaveChanges();
+            return _context.SaveChanges();
 
         }
 
@@ -780,7 +805,7 @@ namespace WISEroster.Business
 
         public List<GcCourse> GetActivateList(int leaId, short schoolYear, int schoolId)
         {
-            var courses = _context.GcCourses.Where(g => g.SchoolId == schoolId && g.SchoolYear == schoolYear && g.Saved==true && (g.Activated==null || g.Activated==false)).ToList();
+            var courses = _context.GcCourses.Where(g => g.SchoolId == schoolId && g.SchoolYear == schoolYear && g.Saved == true && (g.Activated == null || g.Activated == false)).ToList();
             return courses;
 
         }
@@ -798,25 +823,79 @@ namespace WISEroster.Business
                     course.GcCourseUsers.Add(gcCourseUser);
                 }
             }
-            
+
             return course;
+        }
+
+        public List<GcCourse> GetClassesToTransfer(int leaId, short schoolYear, int schoolId)
+        {
+            var courses = _context.GcCourses.Where(g => g.SchoolId == schoolId && g.SchoolYear == schoolYear && g.Saved == true && g.Activated == true && g.GcCourseUsers.Any(u=>u.UserId != g.Owner)).ToList();
+            var courseTeachers = _context.GcCourseUsers.Where(c =>
+                c.IsTeacher && c.GcCourse.SchoolId == schoolId && c.GcCourse.SchoolYear == schoolYear && c.GcCourse.Saved == true && c.GcCourse.Activated== true && c.UserId!= c.GcCourse.Owner).ToList();
+            var pref = _context.OrgGcPreferences.FirstOrDefault(p => p.EducationOrganizationId == leaId);
+            var domain = pref.GcUserEmail.Substring(pref.GcUserEmail.IndexOf("@", StringComparison.CurrentCultureIgnoreCase));
+            foreach (var gcCourse in courses)
+            {
+                var tq = courseTeachers.Where(t =>
+                    t.EducationOrganizationId == gcCourse.EducationOrganizationId &&
+                        t.LocalCourseCode == gcCourse.LocalCourseCode &&
+                                            t.SchoolId == gcCourse.SchoolId &&
+                                            t.SectionIdentifier == gcCourse.SectionIdentifier &&
+                                            t.SchoolYear == gcCourse.SchoolYear &&
+                                            t.SessionName == gcCourse.SessionName);
+                if (pref != null && !string.IsNullOrWhiteSpace(pref.GcUserEmail) && !pref.AllowExternalDomains)
+                {
+                    tq = tq.Where(u => u.EmailAddress.Contains(domain));
+                }
+
+                if (tq.Count() == 1)
+                {
+                    gcCourse.GcCourseUsers.Add(tq.First());
+                }
+            }
+            
+            return courses;
         }
 
         public int SaveSyncProgress(int leaId, short schoolYear, int schoolId, List<GcCourse> courses)
         {
             var names = courses.Select(c => c.GcName).ToList();
-            var existing = _context.GcCourses.Where(g => g.SchoolId == schoolId && g.SchoolYear == schoolYear && names.Contains(g.GcName)).ToList();
+            var existing = _context.GcCourses.Where(g => g.SchoolId == schoolId && g.SchoolYear == schoolYear && names.Contains(g.GcName)).Include(g=>g.GcCourseUsers).ToList();
             foreach (var gcCourse in courses)
             {
                 var toUpdate = existing.First(e => e.GcName == gcCourse.GcName);
                 toUpdate.Saved = gcCourse.Saved;
-                toUpdate.GcMessage = gcCourse.GcMessage.Length>200? gcCourse.GcMessage.Substring(0,197) + "...": gcCourse.GcMessage;
+                toUpdate.Activated = gcCourse.Activated;
+                toUpdate.GcMessage = gcCourse.GcMessage.Length > 200 ? gcCourse.GcMessage.Substring(0, 197) + "..." : gcCourse.GcMessage;
                 if (gcCourse.Saved.GetValueOrDefault())
                 {
                     toUpdate.Owner = gcCourse.Owner;
-                    toUpdate.GcId = gcCourse.GcId;
+                    toUpdate.AliasId = gcCourse.AliasId;
                 }
+
+                foreach (var gcCourseGcCourseUser in gcCourse.GcCourseUsers)
+                {
+                    var userToUpdate =
+                        toUpdate.GcCourseUsers.First(u => u.EmailAddress == gcCourseGcCourseUser.EmailAddress);
+                    if (userToUpdate.UserId !=
+                        gcCourseGcCourseUser.UserId)
+                    {
+                        userToUpdate.UserId = gcCourseGcCourseUser.UserId;
+                    }
+                }
+
+
             }
+            return _context.SaveChanges();
+
+        }
+
+        public int SaveLog(List<GcLog> errors)
+        {
+            var ret = _context.Database.ExecuteSqlCommand(
+                "Delete from dbo.GcLog where DateLogged < DATEADD(DAY, -14, getdate())");
+
+            _context.GcLogs.AddRange(errors);
             return _context.SaveChanges();
 
         }

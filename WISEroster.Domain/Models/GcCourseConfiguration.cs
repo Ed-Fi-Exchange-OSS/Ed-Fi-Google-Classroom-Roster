@@ -39,10 +39,11 @@ namespace WISEroster.Domain.Models
             Property(x => x.CreateDate).HasColumnName(@"CreateDate").HasColumnType("datetime").IsRequired();
             Property(x => x.GcName).HasColumnName(@"GcName").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(154).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Computed);
             Property(x => x.Owner).HasColumnName(@"Owner").HasColumnType("nvarchar").IsOptional().HasMaxLength(200);
-            Property(x => x.GcId).HasColumnName(@"GcId").HasColumnType("nvarchar").IsOptional().HasMaxLength(200);
+            Property(x => x.AliasId).HasColumnName(@"AliasId").HasColumnType("nvarchar").IsOptional().HasMaxLength(200);
             Property(x => x.Saved).HasColumnName(@"Saved").HasColumnType("bit").IsOptional();
             Property(x => x.Activated).HasColumnName(@"Activated").HasColumnType("bit").IsOptional();
             Property(x => x.GcMessage).HasColumnName(@"GcMessage").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(200);
+            Property(x => x.CourseId).HasColumnName(@"CourseId").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(200);
             InitializePartial();
         }
         partial void InitializePartial();

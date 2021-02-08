@@ -1,12 +1,7 @@
-﻿using System;
+﻿using log4net;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc.Filters;
-using log4net;
 using WISEroster.Business;
-using WISEroster.Mvc.Extensions;
 
 namespace WISEroster.Mvc.ImplementationSpecific
 {

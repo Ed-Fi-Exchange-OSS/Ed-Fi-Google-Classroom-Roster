@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WISEroster.Business.Models
+﻿namespace WISEroster.Business.Models
 {
-   public class GcClassName
+    public class GcClassName
     {
         public string LocalCourseCode { get; set; }
         public string SectionIdentifier { get; set; }

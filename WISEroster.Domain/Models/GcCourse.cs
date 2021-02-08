@@ -29,11 +29,12 @@ namespace WISEroster.Domain.Models
         public System.DateTime CreateDate { get; set; } // CreateDate
         public string GcName { get; private set; } // GcName (length: 154)
         public string Owner { get; set; } // Owner (length: 200)
-        public string GcId { get; set; } // GcId (length: 200)
+        public string AliasId { get; set; } // AliasId (length: 200)
         public bool? Saved { get; set; } // Saved
         public bool? Activated { get; set; } // Activated
         public string GcMessage { get; set; } // GcMessage (length: 200)
-
+        public string CourseId { get; set; } // CourseId (length: 200)
+  
         // Reverse navigation
 
         /// <summary>

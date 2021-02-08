@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using log4net;
+using System;
 using System.Configuration;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Mvc.Filters;
 using System.Web.Routing;
-using log4net;
 using WISEroster.Business;
 using WISEroster.Mvc.Extensions;
 
 namespace WISEroster.Mvc.ImplementationSpecific
 {
 
-        public class CurrentAgencyFilter : IAuthenticationFilter
+    public class CurrentAgencyFilter : IAuthenticationFilter
         {
         private readonly ISessionInfo _sessionInfo;
         private readonly IOrganizationBusiness _orgBusiness;

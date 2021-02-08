@@ -191,6 +191,7 @@
     Settings.TableFilterInclude = new Regex(@"
                                     ^GcCourse$|
                                     ^GcCourseUser$|
+                                    ^GcLog$|
                                     ^OrgGcPreferences$|
                                     ^ProvisioningRules$|
                                     ^ProvisioningRuleType$|

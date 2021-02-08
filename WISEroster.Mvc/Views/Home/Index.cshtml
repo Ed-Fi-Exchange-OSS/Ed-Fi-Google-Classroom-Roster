@@ -229,7 +229,7 @@
                     },
                     { data: "SchoolYear" },
                     { data: "SchoolNames" },
-                    { data: "SelectionDetail"},
+                    { data: "SelectionDetail" },
                     { data: "SessionName" },
                     { data: "Courses" },
                     { data: "GradeNames" },
@@ -242,10 +242,23 @@
                     {
                         orderable: false,
                         data: "RuleId",
-                        render: function(data) {
-                            return '<button class="ruleDelete btn-primary" data-id="' +
+                        render: function(data, type, row) {
+                            var str;
+                            if (row.StaffOnly == true) {
+                                str = '<button class="ruleIncludeStudents btn-primary" data-id="' +
+                                    data +
+                                    '">Include Students</button> ';
+                            } else {
+                                str = '<button class="ruleStaffOnly btn-primary" data-id="' +
+                                    data +
+                                    '">Staff Only</button> ';
+                            }
+
+                            return str +
+                                ' <button class="ruleDelete btn-danger" data-id="' +
                                 data +
                                 '">Remove</button>';
+
                         }
                     }
                 ],
@@ -283,6 +296,38 @@
                     var ruleId = $(this).data("id");
                     $.ajax({
                         url: "@Url.Action("DeleteRule", "Home")",
+                        type: 'POST',
+                        datatype: 'JSON',
+                        data: { id: ruleId },
+                        success:
+                            function() {
+                                rulesListTable.ajax.reload();
+                            }
+                    });
+                });
+
+            $('#rulesList tbody').on('click',
+                '.ruleIncludeStudents',
+                function() {
+                    var ruleId = $(this).data("id");
+                    $.ajax({
+                        url: "@Url.Action("IncludeStudents", "Home")",
+                        type: 'POST',
+                        datatype: 'JSON',
+                        data: { id: ruleId },
+                        success:
+                            function() {
+                                rulesListTable.ajax.reload();
+                            }
+                    });
+                });
+
+            $('#rulesList tbody').on('click',
+                '.ruleStaffOnly',
+                function() {
+                    var ruleId = $(this).data("id");
+                    $.ajax({
+                        url: "@Url.Action("StaffOnly", "Home")",
                         type: 'POST',
                         datatype: 'JSON',
                         data: { id: ruleId },
@@ -405,7 +450,7 @@
 
             });
 
-          $("#CourseTitleByTeacher").on("change",
+        $("#CourseTitleByTeacher").on("change",
             function() {
                 //alert($(this).val());
                 if ($(this).val() == "") {

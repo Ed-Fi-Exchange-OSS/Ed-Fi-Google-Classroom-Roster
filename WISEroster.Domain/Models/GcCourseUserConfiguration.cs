@@ -37,6 +37,7 @@ namespace WISEroster.Domain.Models
             Property(x => x.SectionIdentifier).HasColumnName(@"SectionIdentifier").HasColumnType("nvarchar").IsRequired().HasMaxLength(255).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
             Property(x => x.EmailAddress).HasColumnName(@"EmailAddress").HasColumnType("nvarchar").IsRequired().HasMaxLength(128).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
             Property(x => x.IsTeacher).HasColumnName(@"IsTeacher").HasColumnType("bit").IsRequired();
+            Property(x => x.UserId).HasColumnName(@"UserId").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(200);
 
             // Foreign keys
             HasRequired(a => a.GcCourse).WithMany(b => b.GcCourseUsers).HasForeignKey(c => new { c.EducationOrganizationId, c.SchoolYear, c.SchoolId, c.LocalCourseCode, c.SectionIdentifier, c.SessionName }); // FK_GcCourse_GcCourseUser

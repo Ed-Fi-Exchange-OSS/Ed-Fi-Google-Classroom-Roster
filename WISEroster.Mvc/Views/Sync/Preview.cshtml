@@ -1,6 +1,20 @@
 ﻿@model WISEroster.Mvc.Models.SyncViewModel
 
 <br />
+
+        <div class="row">
+            <ol>
+                <li>Generate Sync List: Saves a working list of courses to be sent to Google Classroom.</li>
+                <li>Sync Courses: Saves classes and invites teachers and students and logs the corresponding IDs.  This only adds classes and invites teachers and students.  No deletes occur.</li>
+                <li>Activate Courses: Makes the classes available/visible for teachers and students.</li>
+                <li>In Google Classroom: The Teacher must Accept the course in Google Classroom.</li>
+                <li>Transfer Ownership: Issue an invitation for a teacher to own the class in Google Classroom.  This will only work if a single teacher (other than the administrator) is added to the class.</li>
+                <li>In GMail: The Teacher must Accept the invitation to own in Google Classroom.</li>
+            </ol>
+
+
+</div>
+
 <div class="row">
     <div class="col">
         <div class="card">
@@ -36,22 +50,27 @@
                 <b>Classroom Sync List</b>
             </div>
             <div class="card-body">
+              
                 <div class="row">
-                    <div class="col-md-4"> <span id="testConnection" class="h5"></span><br /> <span id="existingClasses"></span></div>
-                    <div class="col-md-4" id="buttonDiv"><button type="button" id="syncButton" class="btn-primary">Sync Only New Courses</button> 
-                        <button type="button" id="syncButtonAll" class="btn-primary">Sync All Courses</button> 
-                        <button type="button" id="activateButton" class="btn-primary">Activate Saved Courses</button></div>
-                    <div class="col-md-4" id="spinnerDiv"><span>Sending data... this might take a while.</span><div class="loader" id="syncSpinner"></div></div>
+                    <div class="col-md-4"> <span id="testConnection" class="h5"></span><br/> <span id="existingClasses"></span></div>
+                    <div class="col-md-4" id="buttonDiv">
+                        <button type="button" id="syncButton" class="btn-primary">Sync Courses</button>
+                        <button type="button" id="activateButton" class="btn-primary">Activate Courses</button>
+                        <button type="button" id="transferButton" class="btn-primary">Transfer Course Ownership</button>
+                    </div>
+                    <div class="col-md-4" id="spinnerDiv"><span>Sending data... this might take a while.</span>
+                        <div class="loader" id="syncSpinner"></div></div>
 
                 </div>
                 <div id="ruleListGridDiv">
                     <table id="rulesList" class="table table-condensed table-bordered" width="100%">
                         <thead>
                         <tr>
-                            <th width="20%"><ol><li>Session Name</li>
-                                <li>Grade or Local Course Code</li>
-                                <li>Local Course Title</li>
-                                <li>Section Identifier</li></ol></th>
+                            <th width="20%">
+                                <ol><li>Session Name</li>
+                                    <li>Grade or Local Course Code</li>
+                                    <li>Local Course Title</li>
+                                    <li>Section Identifier</li></ol></th>
                             <th width="20%">GcName / Include For Sync</th>
                             <th>Staff</th>
                             <th>Students</th>
@@ -76,11 +95,7 @@
         var myTimer;
 
         function filter() {
-            return { schoolYear: $("#SchoolYear").val(), schoolId: $("#SchoolId").val(), allCourses: false };
-        }
-
-        function filterAll() {
-            return { schoolYear: $("#SchoolYear").val(), schoolId: $("#SchoolId").val(), allCourses: true };
+            return { schoolYear: $("#SchoolYear").val(), schoolId: $("#SchoolId").val() };
         }
 
         $("#spinnerDiv").hide();
@@ -157,12 +172,20 @@
                                     '"><button class="classSync btn-primary" data-id="' +
                                     data.GcName +
                                     '">Sync</button></span>') +
-                                (data.Saved && !data.Activated
+                                (data.Saved 
                                     ? ' <span id="a' +
                                     data.GcName +
                                     '"><button class="classActivate btn-primary" data-id="' +
                                     data.GcName +
                                     '">Activate</button></span>'
+                                    : ''
+                                ) +
+                                (data.Saved && data.Activated
+                                    ? ' <span id="a' +
+                                    data.GcName +
+                                    '"><button class="classTransfer btn-primary" data-id="' +
+                                    data.GcName +
+                                    '">Transfer</button></span>'
                                     : ''
                                 );
                         }
@@ -209,6 +232,22 @@
                             }
                     });
                 });
+
+            $('#rulesList tbody').on('click',
+                '.classTransfer',
+                function() {
+                    var id = $(this).data("id");
+                    $.ajax({
+                        url: "@Url.Action("SendInvite", "Sync")",
+                        type: 'POST',
+                        datatype: 'JSON',
+                        data: { schoolYear: $("#SchoolYear").val(), schoolId: $("#SchoolId").val(), id: id },
+                        success:
+                            function(data) {
+                                $(document.getElementById("a" + id)).html(data);
+                            }
+                    });
+                });
         }
 
 
@@ -237,18 +276,7 @@
                     complete: function(data) { syncDone(data); }
                 });
             });
-
-        $("#syncButtonAll").on("click",
-            function() {
-                syncStart();
-                $.ajax({
-                    url: "@Url.Action("SendCourses")",
-                    type: 'POST',
-                    datatype: 'JSON',
-                    data: filterAll(),
-                    complete: function(data) { syncDone(data); }
-                });
-            });
+      
 
         $("#activateButton").on("click",
             function() {
@@ -257,7 +285,19 @@
                     url: "@Url.Action("SendCourseActivations")",
                     type: 'POST',
                     datatype: 'JSON',
-                    data: { schoolYear: $("#SchoolYear").val(), schoolId: $("#SchoolId").val() },
+                    data: filter(),
+                    complete: function(data) { syncDone(data); }
+                });
+            });
+
+        $("#transferButton").on("click",
+            function() {
+                syncStart();
+                $.ajax({
+                    url: "@Url.Action("SendOwnerInvitations")",
+                    type: 'POST',
+                    datatype: 'JSON',
+                    data: filter(),
                     complete: function(data) { syncDone(data); }
                 });
             });

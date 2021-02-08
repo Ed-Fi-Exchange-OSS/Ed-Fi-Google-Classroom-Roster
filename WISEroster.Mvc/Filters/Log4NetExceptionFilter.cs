@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using log4net;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http.ExceptionHandling;
 using System.Web.Http.Filters;
-using log4net;
 
 namespace WISEroster.Mvc.Filters
 {

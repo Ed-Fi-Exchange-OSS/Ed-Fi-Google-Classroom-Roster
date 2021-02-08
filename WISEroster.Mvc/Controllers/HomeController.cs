@@ -189,6 +189,36 @@ namespace WISEroster.Mvc.Controllers
 
         }
 
+        [HttpPost]
+        public JsonResult StaffOnly(int id)
+        {
+            try
+            {
+                _provisioningRuleBusiness.StaffOnly(id);
+            }
+            catch (Exception ex)
+            {
+                //TODO: log this
+            }
+            return Json(true);
+
+        }
+
+        [HttpPost]
+        public JsonResult IncludeStudents(int id)
+        {
+            try
+            {
+                _provisioningRuleBusiness.IncludeStudents(id);
+            }
+            catch (Exception ex)
+            {
+                //TODO: log this
+            }
+            return Json(true);
+
+        }
+
         public JsonResult RuleList(short schoolYear)
         {
             var lea = _sessionInfo.CurrentAgencyId.GetValueOrDefault();

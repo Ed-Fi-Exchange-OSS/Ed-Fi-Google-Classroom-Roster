@@ -19,6 +19,7 @@ namespace WISEroster.Domain.Models
     {
         System.Data.Entity.DbSet<GcCourse> GcCourses { get; set; } // GcCourse
         System.Data.Entity.DbSet<GcCourseUser> GcCourseUsers { get; set; } // GcCourseUser
+        System.Data.Entity.DbSet<GcLog> GcLogs { get; set; } // GcLog
         System.Data.Entity.DbSet<OrgGcPreference> OrgGcPreferences { get; set; } // OrgGcPreferences
         System.Data.Entity.DbSet<ProvisioningRule> ProvisioningRules { get; set; } // ProvisioningRules
         System.Data.Entity.DbSet<ProvisioningRuleType> ProvisioningRuleTypes { get; set; } // ProvisioningRuleType
