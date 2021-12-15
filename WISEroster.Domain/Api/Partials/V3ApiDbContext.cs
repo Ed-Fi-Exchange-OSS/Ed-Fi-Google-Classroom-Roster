@@ -12,7 +12,7 @@ namespace WISEroster.Domain.Api
         public void ChangeSchoolYear(short schoolYear)
         {
             var connString = ConfigurationManager.ConnectionStrings["ApiV3DbContext"].ConnectionString;
-            connString = Regex.Replace(connString, @"\d{4,}", schoolYear.ToString());
+            connString = Regex.Replace(connString, @"EdFi_Ods_\d{4,}", $"EdFi_Ods_{schoolYear}");
             Database.Connection.ConnectionString = connString;
         }
     }
